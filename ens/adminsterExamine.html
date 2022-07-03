@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 用户管理界面 -->
+    <!-- 功能:查看用户信息，修改用户信息，admin可查看全部，其他只可看自己 -->
+    <meta charset="UTF-8">
+    <title>报告管理</title>
+    <link href="css/common.css" type="text/css" rel="stylesheet">
+    <link href="css/style.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script src="js/jquery.nicescroll.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#filterList").niceScroll({cursorborder:"",cursorcolor:"#b4dcf3",boxzoom:true});
+        });
+    </script>
+</head>
+<body>
+<div class="topBox">
+    <div class="logo"><img src="images/logo.png"></div>
+    <div class="right">
+        <div class="userBox">
+            <ul class="txBox">
+                <i id="userhead"><img src="images/tx.gif"></i>
+                <p id="jiangwen"></p>
+
+            </ul>
+            <ul class="mail">报告消息<i></i></ul>
+        </div>
+        <div class="ssBox">
+            <input type="text" placeholder="搜索...">
+            <button class="ssBut"></button>
+        </div>
+        <div class="tlef zt">
+            报告管理
+        </div>
+    </div>
+</div>
+
+<div class="ztLeft">
+    <h1 class="title"><span></span>报告列表</h1>  <!--<img id="jiayonghu" src="images/jia.png">-->
+    <ul class="specialName">
+    </ul>
+</div>
+
+<div class="ztRight">
+    <h1 class="title">编辑报告信息</h1>
+    <div class="edituser">
+        <div>
+            <dl>
+                <dt> 报告名称 </dt>
+                <dd><input id='name' type='text' readonly></dd>
+                <dt> 关键字 </dt>
+                <dd>
+                    <input id='key' type='text' readonly>
+                </dd>
+                <dt> 报告简介 </dt>
+                <dd>
+                    <textarea id='refile' type='text' readonly></textarea></dd>
+                <dt> 报告内容 </dt>
+                <dd>
+                    <textarea id='content' type='text'></textarea>
+                </dd>
+                <dt> 提交时间 </dt>
+                <dd>
+                    <input readonly id='date' type='text'>
+                </dd>
+                <dt> 状态 </dt>
+                <dd>
+                    <select class="input" id="status" style="width: 284px">
+                        <option value ="0">未审核</option>
+                        <option value ="1">审核通过</option>
+                        <option value ="2">审核不通过</option>
+                    </select>
+                </dd>
+            </dl>
+        </div>
+        <div class='xiugai'>
+            <input class='xiugai' type='button' id='edituserinfo' value='提交审核'>
+        </div>
+
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+</script>
+
+<!-- 下拉菜单 -->
+<script type="text/javascript">
+    var type=new Array("1","敏感信息报告管理员","敏感信息报告审核员","敏感信息报告处置员","一般用户")
+    $(document).ready(function () {
+        var kk = window.sessionStorage.getItem('currentuser')
+        document.getElementById('jiangwen').innerHTML=kk
+    $(document).on('click', '.special_list', function () {
+        id=$(this).attr("id");
+        specialName=document.getElementById(id).outerText;
+        console.log(id,specialName);
+    });
+    $(document).on('click', '.add_special', function () {
+        addSpecial();
+    });
+    $(document).on('click', '.mustDelete', function () {
+        mustDeleteId= $(this).attr("dd");
+        mustDeleteName=$(this).get(0).parentNode.textContent;
+        var parent=$(this).get(0).parentNode.parentNode.parentNode;
+        var son=$(this).get(0).parentNode.parentNode
+        parent.removeChild(son);
+        deleteSpecial(mustDeleteId,mustDeleteName);
+    });
+    $(document).on('click', '#edituserinfo', function(){
+        var name = $('#name').val()
+        var key = $('#key').val()
+        var refile = $('#refile').val()
+        var content = $('#content').val()
+        var date = $('#date').val()
+       var select = document.getElementById("status");
+       var status = select.value;
+        xiugai(name,key,refile,content,date,status)
+    });
+    var sts="";
+    var pageNum=0;
+    var pageSize=10;
+
+    $.ajax({
+        type: 'post',
+        url: "http://42.192.116.184:5000/reportlist",
+        data: {"is_valid":0},
+        success: function(data) {
+            console.log(data)
+            data = data['users']
+            for(var i=0;i<data.length;i++){
+                sts+='<div  class="special_list" name="'+data[i][0]+'"  onclick="getuserlist($(this.innerText))"><a href="#"><span><img src="images/bj.png" class="mustDelete" title="删除" dd="'+data[i][0]+'"></span>'+data[i][0]+'</a></div>'
+            }
+            $(".specialName").append(sts)
+        }
+    });
+
+    });
+    function getuserlist(ha) {
+        alert(ha.selector)
+        console.log('######', ha.selector);
+        var heihei=ha.attr("name")
+        var temp=""
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/reportdetail",
+            data: {"username": ha.selector, "status": 1},
+            success: function(data) {
+                alert(data)
+                var jie=data
+                console.log(data)
+                temp = data['users'][0]
+                console.log(temp)
+                document.getElementById("name").value = temp[0]
+                document.getElementById("key").value = temp[1]
+                document.getElementById("refile").value = temp[2]
+                document.getElementById("content").value = temp[3]
+                document.getElementById("date").value = temp[5]
+            }
+        });
+    };
+
+    function xiugai(name,key,refile,content,date,status){
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/examinemessage",
+            data:{"name":name,"key":key,"refile":refile,"content":content,"date":date,"status":status},
+            success: function(data) {
+                alert('修改成功')
+            }
+        })
+    };
+</script>
+
+
+
+<script type="text/javascript" src="js/date.js"></script>
+</body>
+</html>

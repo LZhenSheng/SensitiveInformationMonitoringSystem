@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>信息实时发现</title>
+    <link href="css/common.css" type="text/css" rel="stylesheet">
+    <link href="css/style.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script src="js/jquery.nicescroll.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            $(".genxin").niceScroll({cursorborder:"",cursorcolor:"#b4dcf3",boxzoom:true});
+
+        });
+    </script>
+</head>
+<body>
+<div class="topBox">
+    <div class="logo"><img src="images/logo.png"></div>
+    <div class="right">
+        <div class="userBox">
+            <ul class="txBox">
+                <i id="userhead"><img src="images/tx.gif"></i>
+                <p id="jiangwen"></p>
+            </ul>
+            <ul class="mail">用户消息<i></i></ul>
+        </div>
+        <div class="ssBox">
+            <input type="text" placeholder="搜索...">
+            <button class="ssBut"></button>
+        </div>
+        <div class="tlef zt">
+            信息实时发现
+        </div>
+    </div>
+</div>
+<div class="leftBox">
+    <ul class="menu">
+        <a href="index.html" ><li>首页</li></a>
+        <a href="zhuanTi.html" ><li>关键词管理</li></a>
+        <a href="faxian.html" ><li class="active">信息发现</li></a>
+        <a href="statistics.html"><li>运行统计</li></a>
+        <a href="user.html" ><li>用户管理</li></a>
+    </ul>
+</div>
+
+<div class="ztLefts">
+    <h1 class="title"><span></span>相关词采集数量</h1>
+    <ul class="specialName">
+
+
+    </ul>
+</div>
+
+
+<div class="ztRight">
+    <h1 class="title">消息更新列表</h1>
+    <div class="genxin">
+
+
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $(".zhuanTi").click(function () {
+            $(this).toggleClass("active")
+        })
+    })
+</script>
+
+<!-- 下拉菜单 -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        var kk = window.sessionStorage.getItem('currentuser')
+        document.getElementById('jiangwen').innerHTML=kk
+        $(document).on('click', '.special_list', function () {
+            id=$(this).attr("id");
+            specialName=document.getElementById(id).outerText;
+            prevKv(id,specialName);
+        });
+
+        $(document).on('click', '.add_special', function () {
+            addSpecial();
+        });
+
+        $(document).on('click', '.mustDelete', function () {
+            mustDeleteId= $(this).attr("dd");
+            mustDeleteName=$(this).get(0).parentNode.textContent;
+            var parent=$(this).get(0).parentNode.parentNode.parentNode;
+            var son=$(this).get(0).parentNode.parentNode
+            parent.removeChild(son);
+            deleteSpecial(mustDeleteId,mustDeleteName);
+        });
+        var sts="";
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/chacis",
+            data: {"content":"123", "sourse": window.localStorage.getItem('sourse')},
+            success: function(data) {
+                console.log(data)
+                var datas =data.split(',')
+                for(var i=0;i<datas.length;i++){
+                    sts+='<input  class="special_list" type="checkbox" name="'+datas[i]+'" onclick="faxianGX($(this))" >'+datas[i]+'</input><br/>'
+                }
+                $(".specialName").empty()
+
+                $(".specialName").append(sts)
+            }
+        });
+
+    });
+
+    function faxianGX(ha) {
+        var temp=""
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/duofilter",
+            data: {"content": ha.attr("name")},
+            success: function(data) {
+                for(key in data){
+                    temp +="<li class='cList'><a target='_blank' href='"+key+"'>"+data[key]+"</a></li>";
+                  }
+                $(".genxin").html(temp);
+            }
+        });
+    }
+
+    $(function(){
+        $(".selectBox .fa").on("click",function(event){
+            $(this).parent().next().toggle();//ul弹窗展开
+            if($(this).hasClass("fa-caret-down")){
+                $(this).removeClass("fa-caret-down").addClass("fa-caret-up")//点击input选择适合，小图标动态切换
+            }else{
+                $(this).addClass("fa-caret-down").removeClass("fa-caret-up")//点击input选择适合，小图标动态切换
+            }
+            if (event.stopPropagation) {
+                event.stopPropagation();
+            }else if (window.event) {
+                window.event.cancelBubble = true;
+            }
+        });
+        $(".selectUl li").click(function(event){
+            event=event||window.event;
+            $(this).addClass("actived_li").siblings().removeClass("actived_li");//点击当前的添加。actived_li这个类；其他的移除这个类名
+            var oliName = $(this).attr("oliName");//定义一个name属性，获取点击的元素属性赋值到当前，方便动态化传值
+            var oliId = $(this).attr("oliId");//定义一个id属性，获取点击的元素属性赋值到当前，方便数据交互传值
+            $(this).parent().prev().children().val(oliName); //把当前点击的name赋值到显示的input的val里面
+            $(this).parent().prev().children().attr("oliName",oliName);//把当前点击的oliName赋值到显示的input的oliName里面
+            $(this).parent().prev().children().attr("oliId",oliId);//把当前点击的oliId赋值到显示的input的oliId里面
+        });
+        $(document).click(function(event){
+            event=event||window.event;
+            $(".inputCase .fa").removeClass("fa-caret-up").addClass("fa-caret-down")//当点隐藏ul弹窗时候，把小图标恢复原状
+            $(".selectUl").hide();
+        });
+        function zhanshi(value) {
+            alert(value);
+        }
+    });
+    var  zhuid="";
+    var  specialName="";
+    var  mustlist="";
+    function prevKv(id,specialName){
+        zhuid=id;
+        specialName=specialName;
+        mustlist="";
+        $.post("http://127.0.0.1:8080/subject/selectById?id="+id,{},function(result) {
+                    console.log(result);
+                    asdf=""
+                    if (result.data.mustContain !=null && result.data.mustContain !="") {
+                        arr=result.data.mustContain.split(",")
+                        for (var i=0;i<arr.length;i++){
+                            asdf+=asdf+'<div>'+arr[i]+'<i id='+id+' class="mustDelete"></i></div>';
+                            mustlist=mustlist+arr[i]+","
+                        }
+                        mustlist=mustlist.substring(0,mustlist.length-1)
+                    }
+                    asdf=asdf+'';
+                    $('.baohan').prepend(asdf)
+                })
+    }
+    function addSpecial(){
+        var special_id = Date.now();
+        var subjectName = $("input[name='add_special']").val();
+        var sd = "";
+        alert(subjectName);
+        var  mustContain="";
+        var  notContain="";
+        $.post("http://127.0.0.1:8080/subject/save?subjectName=" + subjectName, {}, function (result) {
+            console.log(result.data.id);
+            sd += '<div  class="special_list" id="' + result.data.id + '" ><a href="#"><span><img src="images/bj.png" dd="'+data[i][0]+'" title="编辑"></span>' + subjectName + '</a></div>';
+            $(".specialName").prepend(sd);
+        })
+    }
+    function deleteSpecial(id,name){
+        zhuid=id;
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/shanchu",
+            data: {"id":zhuid},
+            success: function(data) {
+                if(data){
+                    alert("删除成功")
+                }
+            }
+        });
+    }
+    $('.mustContaind').click(function () {
+        var  sd="";
+        var mustContain=$('#mustcontents').val();
+        var  haid=parseInt(randomNum(7))
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/charu",
+            data: {"mustContain":mustContain,"id":haid},
+            success: function(data) {
+                if(data){
+                    sd += '<div  class="special_list" id="'+haid+'" ><a href="#"><span><img src="images/bj.png" class="mustDelete" dd="'+haid+'" title="编辑"></span>' +mustContain + '</a></div>';
+                    $(".specialName").prepend(sd);
+                    alert("添加成功")
+                    $('#mustcontents').val("")
+                }
+            }
+        });
+    });
+    function randomNum(n) {
+        var t = '';
+        for (var i = 0; i < n; i++) {
+            t += Math.floor(Math.random() * 10);
+        }
+        return t;
+    }
+</script>
+
+
+
+<script type="text/javascript" src="js/date.js"></script>
+</body>
+</html>

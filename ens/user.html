@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 用户管理界面 -->
+    <!-- 功能:查看用户信息，修改用户信息，admin可查看全部，其他只可看自己 -->
+    <meta charset="UTF-8">
+    <title>用户管理</title>
+    <link href="css/common.css" type="text/css" rel="stylesheet">
+    <link href="css/style.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script src="js/jquery.nicescroll.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#filterList").niceScroll({cursorborder:"",cursorcolor:"#b4dcf3",boxzoom:true});
+        });
+    </script>
+</head>
+<body>
+<div class="topBox">
+    <div class="logo"><img src="images/logo.png"></div>
+    <div class="right">
+        <div class="userBox">
+            <ul class="txBox">
+                <i id="userhead"><img src="images/tx.gif"></i>
+                <p id="jiangwen"></p>
+
+            </ul>
+            <ul class="mail">用户消息<i></i></ul>
+        </div>
+        <div class="ssBox">
+            <input type="text" placeholder="搜索...">
+            <button class="ssBut"></button>
+        </div>
+        <div class="tlef zt">
+            用户管理
+        </div>
+    </div>
+</div>
+<div class="leftBox">
+    <ul class="menu">
+        <a href="index.html" ><li>首页</li></a>
+        <a href="zhuanTi.html" ><li>关键词管理</li></a>
+        <a href="faxian.html" ><li>信息发现</li></a>
+        <a href="statistics.html"><li>运行统计</li></a>
+        <a href="user.html" ><li class="active">用户管理</li></a>
+    </ul>
+</div>
+
+<div class="ztLeft">
+    <h1 class="title"><span></span>用户列表</h1>  <!--<img id="jiayonghu" src="images/jia.png">-->
+    <ul class="specialName">
+    </ul>
+</div>
+
+<div class="ztRight">
+    <h1 class="title">编辑用户信息</h1>
+    <div class="edituser">
+        
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+</script>
+
+<!-- 下拉菜单 -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        var kk = window.sessionStorage.getItem('currentuser')
+        document.getElementById('jiangwen').innerHTML=kk
+    $(document).on('click', '.special_list', function () {
+        id=$(this).attr("id");
+        specialName=document.getElementById(id).outerText;
+        console.log(id,specialName);
+    });
+    $(document).on('click', '.add_special', function () {
+        addSpecial();
+    });
+    $(document).on('click', '.mustDelete', function () {
+        mustDeleteId= $(this).attr("dd");
+        mustDeleteName=$(this).get(0).parentNode.textContent;
+        var parent=$(this).get(0).parentNode.parentNode.parentNode;
+        var son=$(this).get(0).parentNode.parentNode
+        parent.removeChild(son);
+        deleteSpecial(mustDeleteId,mustDeleteName);
+    });
+    $(document).on('click', '#edituserinfo', function(){
+        var uid = $('#userid').val()
+        var na = $('#newname').val()
+        var nc = $('#newnicheng').val()
+        var lb = $('#newleibie').val()
+        var nqq = $('#newQQ').val()
+        xiugai(na,lb,nc,nqq,uid)
+    });
+    var sts="";
+    var pageNum=0;
+    var pageSize=10;
+
+    $.ajax({
+        type: 'post',
+        url: "http://42.192.116.184:5000/usermanage",
+        data: {"status": 0, "username": window.sessionStorage.getItem("currentuser"), "userid": window.sessionStorage.getItem("currentuserid")},
+        success: function(data) {
+            console.log(data)
+            data = data['users']
+            for(var i=0;i<data.length;i++){
+                sts+='<div  class="special_list" name="'+data[i][0]+'"  onclick="getuserlist($(this.innerText))"><a href="#"><span><img src="images/bj.png" class="mustDelete" title="删除" dd="'+data[i][0]+'"></span>'+data[i][0]+'</a></div>'
+                // sts+='<div  class="special_list" id="'+datas[i][1]+'" onclick="faxianGX($(this))" ><a href="#"><span>'+datas[i].split(':')[1]+'</span>'+datas[i].split(':')[0]+'</a></div>'
+            }
+            $(".specialName").append(sts)
+            // $("#filterList").html(temp);
+        }
+    });
+
+    });
+
+    var test=new Array("超级管理员","敏感信息报告管理员","敏感信息报告审核员","敏感信息报告处置员","一般用户","注册管理员")
+    function getuserlist(ha) {
+        console.log('######', ha.selector);
+        var heihei=ha.attr("name")
+        var temp=""
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/usermanage",
+            data: {"username": ha.selector, "status": 1},
+            success: function(data) {
+                var jie=data
+                temp = data['users'][0]
+                console.log(temp)
+                temp1 = "<div><dl><dt> 账号 </dt><dd><input id='userid' type='text' value='"+temp[0]+"' readonly></dd><dt> 密码 </dt><dd><input id='newname' type='text' value='"+temp[1]+"'><dt> 用户类别 </dt><dd><input id='newleibie' type='text' value='"+test[temp[2]]+"' readonly></dd><dt> 昵称 </dt><dd><input id='newnicheng' type='text' value='"+temp[3]+"'></dd><dt> QQ </dt><dd><input id='newQQ' type='text' value='"+temp[4]+"'></dd></dl></div><div class='xiugai'><input class='xiugai' type='button' id='edituserinfo' value='提交修改'></div>"
+                $(".edituser").html(temp1);
+            }
+        });
+    };
+    function xiugai(nn, lb, nc, qq, uid){
+        console.log(nn,lb,nc,qq,uid)
+        if(lb==test[0]){
+            lb=0
+        }else if(lb==test[2]){
+            lb=2
+        }else if(lb==test[3]){
+            lb=3
+        }else if(lb==test[4]){
+            lb=4
+        }else if(lb==test[1]){
+            lb=1
+        }else{
+            lb=5
+        }
+        console.log(nn,lb,nc,qq,uid)
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/usermanage",
+            data: {"username": nn, "status": '2',"leibie":lb, "nicheng": nc, "qq": qq, "userid": uid},
+            success: function(data) {
+                alert('修改成功')
+            }
+        })
+    };
+</script>
+
+
+
+<script type="text/javascript" src="js/date.js"></script>
+</body>
+</html>

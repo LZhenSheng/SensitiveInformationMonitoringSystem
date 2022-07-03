@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<head xmlns:float="http://www.w3.org/1999/xhtml" xmlns:float="http://www.w3.org/1999/xhtml"
+      xmlns:float="http://www.w3.org/1999/xhtml" xmlns:float="http://www.w3.org/1999/xhtml"
+      xmlns:float="http://www.w3.org/1999/xhtml" xmlns:float="http://www.w3.org/1999/xhtml">
+    <meta charset="utf-8">
+    <title>ECharts - 孤影'Blog</title>
+        <script src="js/echarts.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <link href="css/common.css" type="text/css" rel="stylesheet">
+    <link href="css/style.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script src="js/jquery.nicescroll.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <style>
+.viceDiv_1 {
+    padding-top:3%;
+    padding-bottom:3%;
+    margin-top:4%;
+    text-align:center;
+    float: left;
+    width: 20%;
+    color:#FFF;
+    font-size:26px;
+    font-weight:bold
+}
+.viceDiv_3 {
+    text-align:center;
+    margin-top:4%;
+    color:#FFF;
+    float: left;
+    width: 30%;
+    font-size:20px;
+}
+.viceDiv_2 {
+
+    float: left;
+    width: 40%;
+}
+.vice_1 {
+    margin-top:5%;
+    margin-left:10%;
+    float: left;
+    width: 20%;
+    height: 500px;
+}
+.vice_2 {
+    margin-left:10%;
+    margin-top:5%;
+    margin-left:30%;
+    float: left;
+    width: 40%;
+    height: 500px;
+}
+.mainDiv {
+    float: left;
+    width: 100%;
+    height: 400px;
+}
+.mainDiv2 {
+    float: left;
+    width: 100%;
+    height: 500px;
+}
+.kiv{
+    float: left;
+    width: 100%;
+    height: 1000px;
+    background-color: #162238;
+}
+.dff{
+    text-align:center;
+    width:100%;
+    font-size:30px;
+    font-weight:bold;
+    color:#FFF;
+    height:50px;
+    line-height:50px;
+    text-color:#FFFFFF
+}
+#filterList{
+    margin-left:10px;
+    margin-right:10px;
+    padding-top:10px;
+    padding-bottom:8px;
+    text-align:center;
+    font-size:20px;
+    font-weight:normal;
+    height:125px;
+    background-color:#f9f8f617;
+}
+#viceDiv_1_1{
+    background-color:#f9f8f647;
+    margin-left:10px;
+    margin-right:10px;
+}
+#viceDiv_1_2{
+    background-color:#f9f8f647;
+    margin-left:10px;
+    margin-right:10px;
+    font-size:26px;
+    font-weight:bold
+}
+#filter{
+    margin-left:10px;
+    margin-right:10px;
+    padding-top:10px;
+    padding-bottom:10px;
+    text-align:center;
+    font-size:20px;
+    font-weight:normal;
+    height:310px;
+    background-color:#f9f8f617;
+}
+.liadfng{
+    text-align:center;
+    width:500px;
+    background-color:#f9f8f647;
+    font-size:26px;
+    font-weight:bold;
+    color:#FFF
+}
+.liadfng2{
+    width:500px;
+    text-align:center;
+    background-color:#f9f8f647;
+    font-size:26px;
+    font-weight:bold;
+    color:#FFF
+}
+    </style>
+    <script>
+        $(document).ready(function() {
+            $("#filterList").niceScroll({cursorborder:"",cursorcolor:"#b4dcf3",boxzoom:true});
+        });
+    </script>
+</head>
+<body>
+<div class="topBox">
+    <div class="logo"><img src="images/logo.png"></div>
+    <div class="right">
+        <div class="kiv">
+            <div class="dff">敏感信息监控系统</div>
+            <div class="mainDiv">
+                <div class="viceDiv_1">
+                    <div id="viceDiv_1_1">服务请求数据汇总</div>
+                    <div  id="filterList"></div>
+                </div>
+                <div class="viceDiv_2" id="map" style="height:450px"></div>
+                <div class="viceDiv_3">
+                    <div id="viceDiv_1_2">实时请求情况</div>
+                    <div  id="filter"></div>
+                </div>
+            </div>
+            <div class="mainDiv2">
+                <div class="vice_1">
+                    <div class="liadfng">近7天请求量</div>
+                    <div id="main" style="width:500px;height:300px"></div>
+                </div>
+                <div class="vice_2">
+                    <div class="liadfng2">各关键词抓取次比例</div>
+                    <div id="circle" style="width:500px;height:400px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="leftBox">
+    <ul class="menu">
+        <a href="index.html" ><li>首页</li></a>
+        <a href="zhuanTi.html" ><li>关键词管理</li></a>
+        <a href="faxian.html" ><li >信息发现</li></a>
+        <a href="statistics.html"><li class="active">运行统计</li></a>
+        <a href="user.html" ><li>用户管理</li></a>
+    </ul>
+</div>
+<!-- ECharts单文件引入 -->
+<script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+<script type="text/javascript">
+    $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/getmap",
+            success: function(data2) {
+                $.get('json/FeHelper-20220409233219.json', function (cZjson) {
+        echarts.registerMap('中国', cZjson);
+        var chart = echarts.init(document.getElementById('map'));
+
+        option = {
+            title: {
+                x:'center'
+            },
+            dataRange:{
+            	min:0,
+            	max:10000,
+            	text:['高','低'],
+            	realtime:true,
+            	calculable:true,
+            	color:['orangered','yellow','green'],
+            	textStyle:{
+		            color:"#FFFFFF"
+		        }
+            },
+            series:[
+            	{
+            		name:'全国分布',
+            		type:'map',
+            		map:'中国',
+            		mapLocation:{
+            			y:60
+            		},
+            		itemSytle:{
+            			emphasis:{label:{show:true}}
+            		},
+            		data:data2
+            	}
+            ],
+
+        };
+        chart.setOption(option);
+});
+           }
+    });
+    $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/getstatisticsdata",
+            success: function(data) {
+                tmp="<li class='cList'>请求时间"+"     "+"请求数量"+"     "+"办理状态</li>";
+                for(var i=0;i<10;i++){
+                    tmp+="<li class='cList'>"+data[i][2]+"     "+data[i][1]+"     已解决</li>";
+                }
+                $("#filter").html(tmp);
+           }
+    });
+    $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/gettotal",
+            success: function(data) {
+                tmp=""
+                tmp+="<li class='cList'>当日请求量:"+data[0]+"</li>";
+                tmp+="<li class='cList'>昨日请求量:"+data[1]+"</li>";
+                tmp+="<li class='cList'>本月请求量:"+data[2]+"</li>";
+                tmp+="<li class='cList'>总请求量:"+data[3]+"</li>";
+                $("#filterList").html(tmp);
+           }
+    });
+    $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/getcircle",
+            success: function(da1ta) {
+               var myChart = echarts.init(document.getElementById('circle'));
+               myChart.setOption({
+               color: ['#ff0000','#00ff00', '#0000ff', '#d48265', '#91c7ae','#749f83',  '#ca8622', '#bda29a','#6e7074', '#546570', '#c4ccd3'],
+               series : [
+               {
+                    name: '访问来源',
+                    type: 'pie',
+                    radius: '40%',
+                    data:da1ta
+                }
+               ]
+        })
+           }
+    });
+
+
+        require.config({
+            paths: {
+                echarts: 'http://echarts.baidu.com/build/dist'
+            }
+        });
+
+        require(
+            [
+                'echarts',
+                'echarts/chart/bar'
+            ],
+            function (ec) {
+                var myChart = ec.init(document.getElementById('main'));
+                $.ajax({
+                type: 'post',
+                url: "http://42.192.116.184:5000/getdata",
+                success: function(data) {
+                  var option = {
+                    tooltip: {
+                        show: true
+                    },
+                    legend: {
+                        data:['数量']
+                    },
+                    xAxis : [
+                        {
+                            type : 'category',
+                            data : ["一天前","两天前","三天前","四天前","五天前","六天前","七天前"],
+                            axisLabel:{//修改坐标系字体颜色
+		                        show:true,
+		                        textStyle:{
+		                            color:"#FFFFFF"
+		                        }
+	                        }
+                        }
+                    ],
+                    yAxis : [
+                        {
+                            type : 'value',
+                            axisLabel:{//修改坐标系字体颜色
+		                        show:true,
+		                        textStyle:{
+		                            color:"#FFFFFF"
+		                        }
+	                        }
+                        }
+                    ],
+                    series : [
+                        {
+                            "name":"数量",
+                            "type":"bar",
+                            "data":[data[0], data[1], data[2], data[3], data[4], data[5],data[6]]
+                        }
+                    ]
+                };
+
+                myChart.setOption(option);
+                }
+            });
+            }
+        );
+</script>
+</body>

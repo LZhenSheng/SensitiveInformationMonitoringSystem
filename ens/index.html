@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <link href="css/bootstrap.min.css" type="text/css" rel="stylesheet">
+    <link href="css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet">
+    <link href="css/common.css" type="text/css" rel="stylesheet">
+    <link href="css/style.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
+    <script src="js/jquery.nicescroll.min.js"></script>
+    <script src="js/jquery.esn.autobrowse.js"></script>
+    <script src="js/jstorage.js"></script>
+    <script src="js/changeindexname.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $("#filterList").niceScroll({cursorborder:"",cursorcolor:"#b4dcf3",boxzoom:true});
+            var kk = window.sessionStorage.getItem('currentuser')
+            document.getElementById('jiangwen').innerHTML=kk
+        });
+
+    </script>
+</head>
+<body>
+<div class="topBox">
+    <div class="logo"><img src="images/logo.png"></div>
+    <div class="right">
+        <div class="userBox">
+            <ul class="txBox">
+                <i id="userhead"><img src="images/tx.gif"></i>
+                <p id="jiangwen"></p>
+            </ul>
+            <ul class="mail">用户消息<i></i></ul>
+        </div>
+        <div class="ssBox">
+            <input class="searchtext" type="text" placeholder="搜索..." name="must">
+            <button class="ssBut" id="search"></button>
+        </div>
+        <div class="tlef zt">
+            首页
+        </div>
+    </div>
+</div>
+
+<div class="leftBox">
+    <ul class="menu">
+        <a href="index.html">
+            <li class="active">首页</li>
+        </a>
+        <a href="zhuanTi.html">
+            <li>关键词管理</li>
+        </a>
+        <a href="faxian.html">
+            <li>信息发现</li>
+        </a>
+        <a href="statistics.html">
+            <li>运行统计</li>
+        </a>
+        <a href="user.html">
+            <li>用户管理</li>
+        </a>
+    </ul>
+</div>
+<div class="cenBox">
+    <div class="cTop">
+        来源：
+        <div class="check" id="weibo"><span></span>微博</div>     <!--checked变不回check-->
+        <div class="check" id="zhihu"><span></span>知乎</div>
+    </div>
+    <div class="cListBox">
+        <ul id="filterList">
+            请输入查询条件
+        </ul>
+    </div>
+
+</div>
+<script type="text/javascript">
+    $(function () {
+        $(".zhuanTi").click(function () {
+            $(this).toggleClass("active")
+        })
+        $(".checked").click(function(){
+            $('.checked').addClass("check")
+            window.localStorage.removeItem('sourse')
+        });
+        $(".check").click(function(){
+            $(this).toggleClass("checked")
+            window.localStorage.setItem('sourse', $(this).attr('id'))
+            alert(window.localStorage.getItem('sourse'))
+        });
+    })
+
+</script>
+
+<!-- 下拉菜单 -->
+<script type="text/javascript">
+    $(function(){
+		// <!-- 查询 -->
+		$("#search").on("click",function(){
+			var ss = "http://192.168.1.20:8083/";
+			var must = $("input[name='must']").val();
+			console.log(must,'查询条件')
+            num=0;
+            var temp = "";
+            $("#filterList").html("查询中");
+            $.ajax({
+                type: 'post',
+                url: "http://42.192.116.184:5000/shibie",
+                data: {"content": must, "sourse": window.localStorage.getItem('sourse')},
+                success: function(data) {
+                  for(key in data){
+                    temp +="<li class='cList'><a target='_blank' href='"+key+"'>"+data[key]+"</a></li>";
+                  }
+                  $("#filterList").html(temp);
+                }
+            });
+
+
+		});
+            
+        //回车键搜索
+		$(".searchtext").on("keypress",function(event){
+		    console.log(event,123);
+			if(event.keyCode===13) {
+				var ss = "http://192.168.1.20:8083/";
+				var must = $("input[name='must']").val();
+                must = dealValue(must);
+				console.log(must,'查询条件');
+				var  num=1;
+				var temp = "";
+				$("#filterList").html("查询中");
+				$.post("http://192.168.1.20:8080/ENS-WEB?must="+must+"&num="+num,{},function(result){
+					var html = [];
+					result.map(item => {
+						temp +="<li class='cList'><div class='checkBox'><i></i></div><a href=''><h1>"+item.nick_name+"</h1><p>"+item.content+"</p><p class='bei'><a href='"+ss+item.snapshot+"' target='_blank'>查看快照</a> &nbsp; &nbsp; 发布时间：<a href='"+item.url+"' target='_blank'>"+item.publish_time+"</a>	</p></a><div class='shouBox'>收藏</div></li>";
+					});
+					if(temp.length>1) {
+						$("#filterList").html(temp);
+					}else {
+						$("#filterList").html("暂无结果");
+					}
+				})
+			}
+		});
+
+       })
+
+
+</script>
+<script type="text/javascript" src="js/date.js"></script>
+</body>
+</html>

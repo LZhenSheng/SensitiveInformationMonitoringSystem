@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 用户管理界面 -->
+    <!-- 功能:查看用户信息，修改用户信息，admin可查看全部，其他只可看自己 -->
+    <meta charset="UTF-8">
+    <title>报告管理</title>
+    <link href="css/common.css" type="text/css" rel="stylesheet">
+    <link href="css/style.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script src="js/jquery.nicescroll.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <style>
+        .inputstyle{
+            width:250px
+        }
+        .inputstyle2{
+            width:250px;
+            height:100px
+        }
+        .divstyle{
+            margin-bottom:60px
+        }
+        .mybutton{
+                margin-top:50px;
+            margin-left:300px
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $("#filterList").niceScroll({cursorborder:"",cursorcolor:"#b4dcf3",boxzoom:true});
+        });
+    </script>
+</head>
+<body>
+<div class="topBox">
+    <div class="logo"><img src="images/logo.png"></div>
+    <div class="right">
+        <div class="userBox">
+            <ul class="txBox">
+                <i id="userhead"><img src="images/tx.gif"></i>
+                <p id="jiangwen"></p>
+
+            </ul>
+            <ul class="mail">报告消息<i></i></ul>
+        </div>
+        <div class="ssBox">
+            <input type="text" placeholder="搜索...">
+            <button class="ssBut"></button>
+        </div>
+        <div class="tlef zt">
+            报告管理
+        </div>
+    </div>
+</div>
+<div class="leftBox">
+    <ul class="menu">
+        <a href="adminsterRegisterAdd.html" ><li>添加报告</li></a>
+        <a href="adminsterReport.html" ><li class="active">修改报告</li></a>
+    </ul>
+</div>
+
+<div class="ztLeft">
+    <h1 class="title"><span></span>报告列表</h1>  <!--<img id="jiayonghu" src="images/jia.png">-->
+    <ul class="specialName">
+    </ul>
+</div>
+
+<div class="ztRight">
+    <h1 class="title">编辑报告信息</h1>
+    <div class="edituser">
+        <dl>
+            <dt >报告名称</dt>
+            <dd class="baohan">
+            <div class="add"><input type="text" id="keyword"  class="inputstyle" readonly></div></dd>
+        </dl>
+        <dl>
+            <dt >关键字</dt>
+            <dd class="baohan">
+            <div class="add"><input type="text" id="key"  class="inputstyle"></div></dd>
+        </dl>
+        <div  class="divstyle">
+            <dl >
+            <dt >报告简介</dt>
+            <dd class="baohan">
+            <div class="add"><textarea id="refile"  class="inputstyle2"></textarea></div></dd>
+        </dl>
+        </div>
+        <dl>
+            <dt >报告内容</dt>
+            <dd class="">
+            <div class="add"><textarea id="content"  class="inputstyle2"></textarea></div></dd>
+        </dl>
+                <button class="mybutton" id="commit">修改</button>
+
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+</script>
+
+<!-- 下拉菜单 -->
+<script type="text/javascript">
+    $("#commit").click(function () {
+        var name=$('#keyword').val()
+        var key=$('#key').val()
+        var refile=$('#refile').val()
+        var content=$('#content').val()
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/updatereportmessage",
+            data: {"name": name, "key": key,"refile":refile,"content":content},
+            success: function(data) {
+                alert("提交成功")
+            }
+        });
+    })
+    $(document).ready(function () {
+        var kk = window.sessionStorage.getItem('currentuser')
+        document.getElementById('jiangwen').innerHTML=kk
+    $(document).on('click', '.special_list', function () {
+        id=$(this).attr("id");
+        specialName=document.getElementById(id).outerText;
+        console.log(id,specialName);
+    });
+    $(document).on('click', '.add_special', function () {
+        addSpecial();
+    });
+    $(document).on('click', '.mustDelete', function () {
+        mustDeleteId= $(this).attr("dd");
+        mustDeleteName=$(this).get(0).parentNode.textContent;
+        var parent=$(this).get(0).parentNode.parentNode.parentNode;
+        var son=$(this).get(0).parentNode.parentNode
+        parent.removeChild(son);
+        deleteSpecial(mustDeleteId,mustDeleteName);
+    });
+    $(document).on('click', '#edituserinfo', function(){
+        var uid = $('#userid').val()
+        var na = $('#newname').val()
+        var nc = $('#newnicheng').val()
+        var lb = $('#newleibie').val()
+        var nqq = $('#newQQ').val()
+        xiugai(na,lb,nc,nqq,uid)
+    });
+    var sts="";
+    var pageNum=0;
+    var pageSize=10;
+
+    $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/chareport",
+            success: function(data) {
+                console.log(data)
+                for(var i=0;i<data.length;i++){
+                    sts+='<div  class="special_list" id="'+data[i][0]+'" onclick="getuserlist($(this.innerText))"><a href="#"><span></span>'+data[i][0]+'</a></div>'
+                }
+                $(".specialName").append(sts)
+            }
+        });
+
+    });
+
+    function getuserlist(ha) {
+        console.log('######', ha.selector);
+        var heihei=ha.attr("name")
+        var temp=""
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/report",
+            data: {"name": ha.selector},
+            success: function(data) {
+                document.getElementById("keyword").value = data[0]
+                document.getElementById("key").value = data[1]
+                document.getElementById("refile").value = data[2]
+                document.getElementById("content").value = data[3]
+<!--                console.log(data)-->
+            }
+        });
+    };
+    function xiugai(nn, lb, nc, qq, uid){
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/usermanage",
+            data: {"username": nn, "status": '2',"leibie":lb, "nicheng": nc, "qq": qq, "userid": uid},
+            success: function(data) {
+                alert('修改成功')
+            }
+        })
+    };
+</script>
+
+
+
+<script type="text/javascript" src="js/date.js"></script>
+</body>
+</html>

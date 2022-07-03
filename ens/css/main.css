@@ -1,0 +1,41 @@
+*{ margin: 0px; padding: 0px;}
+html,body { width: 100%; height:100%; overflow:hidden; font-family: "Microsoft YaHei"; color:#ebc26b;}
+
+
+.title{text-align: center; align-items: center; justify-content: center;padding: 100px;}
+
+.content dl {position: fixed; top:50%;left:30%;}
+.content dl dt { width:170px; max-width:170px; text-align: right; font-size:14px; line-height: 32px; color:#666; float: left; margin-right:10px; font-weight: normal}
+.content dl dd { width: calc(100% - 180px); float: left; height:32px; text-align: left;}
+.content dl dd .input { width: 50%; border:1px solid #ddd; height:30px; line-height: 30px; padding:0px 10px; text-align: left; font-size:14px; color:#666;}
+
+.content dl dy { width:170px; max-width:170px; text-align: right; font-size:14px; line-height: 32px; color:#666; float: left; margin-right:10px; font-weight: normal;margin-top: 10px}
+.content dl ds { width: calc(100% - 180px); float: left; height:32px; text-align: left;margin-top: 10px}
+.content dl ds .input { width: 50%; border:1px solid #ddd; height:30px; line-height: 30px; padding:0px 10px; text-align: left; font-size:14px; color:#666;}
+
+.buttons{position: fixed;left: 36%;top:64%;float: left}
+.buttons  .button { float: left; width: 80px; height:30px; line-height: 30px; text-align: center; background: #169ae6; color:#fff;
+    -webkit-border-radius:3px;
+    -moz-border-radius:3px;
+    border-radius:3px;
+    margin-left: 100px
+}
+.buttons  .button.qk { background: #aaaaaa}
+
+
+.logo { position:fixed; top:40px; left:40px;}
+.right { position: fixed; top:40px; right:40px;}
+
+.input{width: 170px}
+
+.buttonss{position: fixed;left: 33%;top:84%;}
+
+.buttonss  .button { float: left; width: 80px; height:30px; line-height: 30px; text-align: center; background: #169ae6; color:#fff;
+    -webkit-border-radius:3px;
+    -moz-border-radius:3px;
+    border-radius:3px;
+    margin-left: 120px
+}
+
+
+

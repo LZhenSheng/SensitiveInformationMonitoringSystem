@@ -1,0 +1,95 @@
+* { font-family: "Microsoft Yahei";
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;}
+html { width: 100%; height:100%;font-size:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;text-size-adjust:100%}
+body { width: 100%; height:100%; margin:0px; padding: 0px; font-size:100%; }
+p { margin:0px; padding: 0px;}
+ul,li,dl,dt,dd { margin: 0px; padding: 0px; list-style: none}
+a,a:hover { text-decoration: none}
+
+
+button,input { outline: none}
+input::-ms-clear, input::-ms-reveal{
+    /*clear去掉叉  reveal去掉眼睛;但是只能去掉ie10及以上，ie9及以下去不掉*/
+    display: none;
+}
+
+.clear { clear: both; height: 1px; overflow: hidden; line-height: 1px;}
+.hide { display: none}
+
+/**/
+.tcBox {padding-top:10px;}
+.tcBox input[type=text] {
+    border:0; width: 100%; border-bottom:1px solid #666; padding:0px 10px; line-height: 32px; text-align: left; font-size: 14px; background: none;
+}
+
+.selectBox{
+    width: 100%;
+    height: 32px;
+    line-height: 32px;
+    background: #fff;
+}
+input::-ms-clear, input::-ms-reveal{
+    /*clear去掉叉  reveal去掉眼睛;但是只能去掉ie10及以上，ie9及以下去不掉*/
+    display: none;
+}
+
+.inputCase{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+.inputCase input.imitationSelect{
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    display: block;
+    text-indent: 20px;
+    cursor: default;
+}
+.inputCase i.fa{
+    position: absolute;
+    width:12px;
+    height:6px;
+    right: 10px;
+    top: 14px;
+    color: #007AFF;
+    font-size: 20px;
+    z-index: 99999;
+    background: url("../images/cdot2.png") no-repeat 0px 0px;
+}
+.fa{
+    cursor: pointer;
+}
+.inputCase i.fa-caret-up { background-position: -12px 0px;}
+.selectUl{
+    display: none;
+    padding: 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+}
+.selectUl li{
+    height: 32px;
+    line-height: 32px;
+    list-style: none;
+    text-indent: 20px;
+    border-bottom: 1px solid #ccc;
+    color:#666
+}
+.selectUl li:hover{
+    background: #ddd;
+}
+.selectUl li:last-child{
+    border-bottom: 0 none;
+}
+.xiugai {left: 200px;}
+.form_datetime { width:146px; height:30px; border:1px solid #ddd; padding-left:10px; line-height: 30px; background: #fff url("../images/date.png") no-repeat 120px center; display: inline-block}
+.lang { float: left; width: 20px; height:30px; line-height: 30px; text-align: center; font-size: 16px; color:#999}
+.cell { float: left;}
+.content form { margin:0px;}
+.datetimepicker-dropdown-bottom-right:before,.datetimepicker-dropdown-bottom-right:after { display: none;}

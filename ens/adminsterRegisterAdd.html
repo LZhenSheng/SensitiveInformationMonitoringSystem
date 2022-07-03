@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>报告管理</title>
+    <link href="css/common.css" type="text/css" rel="stylesheet">
+    <link href="css/style.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script src="js/jquery.nicescroll.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <style>
+        .inputstyle{
+            width:250px
+        }
+        .inputstyle2{
+            width:250px;
+            height:100px
+        }
+        .divstyle{
+            margin-bottom:60px
+        }
+        .mybutton{
+                margin-top:50px;
+            margin-left:300px
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $("#filterList").niceScroll({cursorborder:"",cursorcolor:"#b4dcf3",boxzoom:true});
+        });
+    </script>
+</head>
+<body>
+<div class="topBox">
+    <div class="logo"><img src="images/logo.png"></div>
+    <div class="right">
+        <div class="userBox">
+            <ul class="txBox">
+                <i id="userhead"><img src="images/tx.gif"></i>
+                <p id="jiangwen"></p>
+
+            </ul>
+            <ul class="mail">用户消息<i></i></ul>
+        </div>
+        <div class="ssBox">
+            <input type="text" placeholder="搜索...">
+            <button class="ssBut"></button>
+        </div>
+        <div class="tlef zt">
+            专题管理
+        </div>
+    </div>
+</div>
+<div class="leftBox">
+    <ul class="menu">
+        <a href="adminsterRegisterAdd.html" ><li class="active">添加报告</li></a>
+        <a href="adminsterReport.html" ><li>修改报告</li></a>
+    </ul>
+</div>
+
+<div class="ztLeft">
+    <h1 class="title"><span><img id="jiagjc" src="images/jia.png"></span>报告列表</h1>
+    <ul class="specialName">
+    </ul>
+</div>
+
+
+<div class="ztRight">
+    <h1 class="title">报告添加</h1>
+    <div>
+        <dl>
+            <dt >报告名称</dt>
+            <dd class="baohan">
+            <div class="add"><input type="text" id="keyword" class="inputstyle"></div></dd>
+        </dl>
+        <dl>
+            <dt >关键字</dt>
+            <dd class="baohan">
+            <div class="add"><input type="text" id="key"  class="inputstyle"></div></dd>
+        </dl>
+        <div  class="divstyle">
+            <dl >
+            <dt >报告简介</dt>
+            <dd class="baohan">
+            <div class="add"><textarea id="refile"  class="inputstyle2"></textarea></div></dd>
+        </dl>
+        </div>
+        <dl>
+            <dt >报告内容</dt>
+            <dd class="">
+            <div class="add"><textarea id="content"  class="inputstyle2"></textarea></div></dd>
+        </dl>
+        <button class="mybutton" id="commit">提交</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $(".zhuanTi").click(function () {
+            $(this).toggleClass("active")
+        })
+    })
+
+</script>
+
+<!-- 下拉菜单 -->
+<script type="text/javascript">
+    $("#commit").click(function () {
+        var name=$('#keyword').val()
+        var key=$('#key').val()
+        var refile=$('#refile').val()
+        var content=$('#content').val()
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/addreport",
+            data: {"name": name, "key": key,"refile":refile,"content":content},
+            success: function(data) {
+                alert("提交成功")
+            }
+        });
+    })
+
+    $(document).ready(function () {
+        var kk = window.sessionStorage.getItem('currentuser')
+        document.getElementById('jiangwen').innerHTML=kk
+        $(document).on('click', '.special_list', function () {
+            id=$(this).attr("id");
+            specialName=document.getElementById(id).outerText;
+            prevKv(id,specialName);
+        });
+        $(document).on('click', '.add_special', function () {
+            addSpecial();
+        });
+
+        $(document).on('click', '.mustDelete', function () {
+            mustDeleteId= $(this).attr("dd");
+            mustDeleteName=$(this).get(0).parentNode.textContent;
+            var parent=$(this).get(0).parentNode.parentNode.parentNode;
+            var son=$(this).get(0).parentNode.parentNode
+            parent.removeChild(son);
+            deleteSpecial(mustDeleteId,mustDeleteName);
+        });
+        var sts="";
+        var pageNum=0;
+        var pageSize=10;
+
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/chareport",
+            success: function(data) {
+                console.log(data)
+                for(var i=0;i<data.length;i++){
+                    sts+='<div  class="special_list" id="'+data[i][0]+'" ><a href="#"><span></span>'+data[i][0]+'</a></div>'
+                }
+                $(".specialName").append(sts)
+            }
+        });
+    });
+
+    $(function(){
+        $(".selectBox .fa").on("click",function(event){
+            $(this).parent().next().toggle();//ul弹窗展开
+            if($(this).hasClass("fa-caret-down")){
+                $(this).removeClass("fa-caret-down").addClass("fa-caret-up")//点击input选择适合，小图标动态切换
+            }else{
+                $(this).addClass("fa-caret-down").removeClass("fa-caret-up")//点击input选择适合，小图标动态切换
+            }
+            if (event.stopPropagation) {
+                event.stopPropagation();
+            }else if (window.event) {
+                window.event.cancelBubble = true;
+            }
+        });
+        $(".selectUl li").click(function(event){
+            event=event||window.event;
+            $(this).addClass("actived_li").siblings().removeClass("actived_li");//点击当前的添加。actived_li这个类；其他的移除这个类名
+            var oliName = $(this).attr("oliName");//定义一个name属性，获取点击的元素属性赋值到当前，方便动态化传值
+            var oliId = $(this).attr("oliId");//定义一个id属性，获取点击的元素属性赋值到当前，方便数据交互传值
+            $(this).parent().prev().children().val(oliName); //把当前点击的name赋值到显示的input的val里面
+            $(this).parent().prev().children().attr("oliName",oliName);//把当前点击的oliName赋值到显示的input的oliName里面
+            $(this).parent().prev().children().attr("oliId",oliId);//把当前点击的oliId赋值到显示的input的oliId里面
+        });
+        $(document).click(function(event){
+            event=event||window.event;
+            $(".inputCase .fa").removeClass("fa-caret-up").addClass("fa-caret-down")//当点隐藏ul弹窗时候，把小图标恢复原状
+            $(".selectUl").hide();//当点击空白处，隐藏ul弹窗
+        });
+        function zhanshi(value) {
+            alert(value);
+        }
+    });
+
+    var  zhuid="";
+    var  specialName="";
+    var  mustlist="";
+    function prevKv(id,specialName){
+        zhuid=id;
+        specialName=specialName;
+        mustlist="";
+        $.post("http://192.168.1.20:8080/subject/selectById?id="+id,{},function(result) {
+                    console.log(result);
+                    asdf=""
+                    if (result.data.mustContain !=null && result.data.mustContain !="") {
+                        arr=result.data.mustContain.split(",")
+                        for (var i=0;i<arr.length;i++){
+                            asdf+=asdf+'<div>'+arr[i]+'<i id='+id+' class="mustDelete"></i></div>';
+                            mustlist=mustlist+arr[i]+","
+                        }
+                        mustlist=mustlist.substring(0,mustlist.length-1)
+                    }
+                    asdf=asdf+'';
+                    $('.baohan').prepend(asdf)
+                })
+    }
+
+    function addSpecial(){
+        var special_id = Date.now();
+        var subjectName = $("input[name='add_special']").val();
+        var sd = "";
+        alert(subjectName);
+        var  mustContain="";
+        var  notContain="";
+        $.post("http://192.168.1.20:8080/subject/save?subjectName=" + subjectName, {}, function (result) {
+            console.log(result.data.id);
+            sd += '<div  class="special_list" id="' + result.data.id + '" ><a href="#"><span><img src="images/bj.png" dd="'+data[i][0]+'" title="编辑"></span>' + subjectName + '</a></div>';
+            $(".specialName").prepend(sd);
+        })
+
+    }
+
+    function deleteSpecial(id,name){
+        zhuid=id;
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/shanchu",
+            data: {"id":zhuid},
+            success: function(data) {
+                if(data){
+                    alert("删除成功")
+                }
+
+            }
+        });
+    }
+
+    function randomNum(n) {
+        var t = '';
+        for (var i = 0; i < n; i++) {
+            t += Math.floor(Math.random() * 10);
+        }
+        return t;
+    }
+
+</script>
+
+
+
+<script type="text/javascript" src="js/date.js"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>敏感信息监控系统</title>
+    <link href="css/main.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.vticker-min.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript"></script>
+</head>
+<body>
+         <div class="title">
+             <img src="images/LOG.jpg">
+         </div>
+         <div class="content" id="content" style="display: none">
+             <dl>
+                 <dt>用户名</dt>
+                 <dd><input type="text" class="input" id="yonghu"></dd>
+                 <dy>密码</dy>
+                 <ds><input type="password" class="input" id="password"></ds>
+             </dl>
+         </div>
+         <div class="content" id="content2" style="display: none">
+             <dl>
+                 <dt>用户名</dt>
+                 <dd><input type="text" class="input" id="yonghu1" style="width: 260px"></dd>
+                 <dy>密码</dy>
+                 <ds><input type="password" class="input" id="password1" style="width: 260px"></ds>
+                 <dy>昵称</dy>
+                 <ds><input type="text" class="input" id="nicheng1" style="width: 260px"></ds>
+                 <dy>QQ</dy>
+                 <ds><input type="text" class="input" id="qq" style="width: 260px"></ds>
+                 <dy>人员类别</dy>
+                 <ds><select class="input" id="leibie" style="width: 284px">
+                     <option value ="1">敏感信息报告管理员</option>
+                     <option value ="2">敏感信息报告审核员</option>
+                     <option value ="3">敏感信息报告处置员</option>
+                     <option value ="4">一般用户</option>
+                 </select></ds>
+             </dl>
+         </div>
+         <div class="buttonss" id="content3_1" style="display: none">
+             <div class="button qk point" id="queren">提交</div>
+             <div class="button point" id="commits">返回</div>
+         </div>
+         <div class="buttons" id="content2_1" style="display: none">
+             <div class="button point" id="commit">登陆</div>
+             <div class="button qk point" id="zhuce">注册</div>
+         </div>
+
+</body>
+</html>

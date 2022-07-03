@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 用户管理界面 -->
+    <!-- 功能:查看用户信息，修改用户信息，admin可查看全部，其他只可看自己 -->
+    <meta charset="UTF-8">
+    <title>用户管理</title>
+    <link href="css/common.css" type="text/css" rel="stylesheet">
+    <link href="css/style.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script src="js/jquery.nicescroll.min.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#filterList").niceScroll({cursorborder:"",cursorcolor:"#b4dcf3",boxzoom:true});
+        });
+    </script>
+</head>
+<body>
+<div class="topBox">
+    <div class="logo"><img src="images/logo.png"></div>
+    <div class="right">
+        <div class="userBox">
+            <ul class="txBox">
+                <i id="userhead"><img src="images/tx.gif"></i>
+                <p id="jiangwen"></p>
+
+            </ul>
+            <ul class="mail">用户消息<i></i></ul>
+        </div>
+        <div class="ssBox">
+            <input type="text" placeholder="搜索...">
+            <button class="ssBut"></button>
+        </div>
+        <div class="tlef zt">
+            用户管理
+        </div>
+    </div>
+</div>
+
+<div class="ztLeft">
+    <h1 class="title"><span></span>用户列表</h1>  <!--<img id="jiayonghu" src="images/jia.png">-->
+    <ul class="specialName">
+    </ul>
+</div>
+
+<div class="ztRight">
+    <h1 class="title">编辑用户信息</h1>
+    <div class="edituser">
+        <div>
+            <dl>
+                <dt> 用户名 </dt>
+                <dd><input id='username' type='text' readonly></dd>
+                <dt> 密码 </dt>
+                <dd>
+                    <input id='password' type='text' readonly>
+                </dd>
+                <dt> 用户类别 </dt>
+                <dd>
+                    <input id='type' type='text' readonly></dd>
+                <dt> 昵称 </dt>
+                <dd>
+                    <input id='newnicheng' type='text'>
+                </dd>
+                <dt> QQ </dt>
+                <dd>
+                    <input readonly id='newQQ' type='text'>
+                </dd>
+                <dt> 状态 </dt>
+                <dd>
+                    <select class="input" id="status" style="width: 284px">
+                        <option value ="0">未审核</option>
+                        <option value ="1">审核通过</option>
+                        <option value ="2">审核不通过</option>
+                    </select>
+                </dd>
+            </dl>
+        </div>
+        <div class='xiugai'>
+            <input class='xiugai' type='button' id='edituserinfo' value='提交审核'>
+        </div>
+
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+</script>
+
+<!-- 下拉菜单 -->
+<script type="text/javascript">
+    var type=new Array("1","敏感信息报告管理员","敏感信息报告审核员","敏感信息报告处置员","一般用户")
+    $(document).ready(function () {
+        var kk = window.sessionStorage.getItem('currentuser')
+        document.getElementById('jiangwen').innerHTML=kk
+    $(document).on('click', '.special_list', function () {
+        id=$(this).attr("id");
+        specialName=document.getElementById(id).outerText;
+        console.log(id,specialName);
+    });
+    $(document).on('click', '.add_special', function () {
+        addSpecial();
+    });
+    $(document).on('click', '.mustDelete', function () {
+        mustDeleteId= $(this).attr("dd");
+        mustDeleteName=$(this).get(0).parentNode.textContent;
+        var parent=$(this).get(0).parentNode.parentNode.parentNode;
+        var son=$(this).get(0).parentNode.parentNode
+        parent.removeChild(son);
+        deleteSpecial(mustDeleteId,mustDeleteName);
+    });
+    $(document).on('click', '#edituserinfo', function(){
+        var username = $('#username').val()
+        var password = $('#password').val()
+        var type1 = $('#type').val()
+        if(type1==type[1]){
+            type1=1
+        }else if(type1==type[2]){
+            type1=2
+        }else if(type1==type[3]){
+            type1=3
+        }else{
+            type1=4
+        }
+        var newnicheng = $('#newnicheng').val()
+        var nqq = $('#newQQ').val()
+       var select = document.getElementById("status");
+       var status = select.value;
+<!--        alert(status)-->
+        xiugai(username,password,type1,newnicheng,nqq,status)
+    });
+    var sts="";
+    var pageNum=0;
+    var pageSize=10;
+
+    $.ajax({
+        type: 'post',
+        url: "http://42.192.116.184:5000/userlist",
+        data: {"is_valid":0},
+        success: function(data) {
+            console.log(data)
+            data = data['users']
+            for(var i=0;i<data.length;i++){
+                sts+='<div  class="special_list" name="'+data[i][0]+'"  onclick="getuserlist($(this.innerText))"><a href="#"><span><img src="images/bj.png" class="mustDelete" title="删除" dd="'+data[i][0]+'"></span>'+data[i][0]+'</a></div>'
+            }
+            $(".specialName").append(sts)
+        }
+    });
+
+    });
+    function getuserlist(ha) {
+        console.log('######', ha.selector);
+        var heihei=ha.attr("name")
+        var temp=""
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/usermanage",
+            data: {"username": ha.selector, "status": 1},
+            success: function(data) {
+                var jie=data
+                console.log(data)
+                temp = data['users'][0]
+                console.log(temp)
+                document.getElementById("username").value = temp[0]
+                document.getElementById("password").value = temp[1]
+                document.getElementById("type").value = type[temp[2]]
+                document.getElementById("newnicheng").value = temp[3]
+                document.getElementById("newQQ").value = temp[4]
+            }
+        });
+    };
+
+    function xiugai(username,password,type,newnicheng,nqq,status){
+        $.ajax({
+            type: 'post',
+            url: "http://42.192.116.184:5000/updatemessage",
+            data:{"username":username,"password":password,"type":type,"newnicheng":newnicheng,"nqq":nqq,"status":status},
+            success: function(data) {
+                alert('修改成功')
+            }
+        })
+    };
+</script>
+
+
+
+<script type="text/javascript" src="js/date.js"></script>
+</body>
+</html>
